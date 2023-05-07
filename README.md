@@ -4,7 +4,7 @@
 Epoch:  1<br>
         Train Loss: 0.14475 | Train Acc: 47.50%<br>
         Test. Loss: 0.12069 |  Test Acc: 55.20%<br>
-        Time: 265.28 seconds<br><br>
+        Time: 265.28 seconds<br>
 Epoch:  2<br>
         Train Loss: 0.10432 | Train Acc: 63.06%<br>
         Test. Loss: 0.12071 |  Test Acc: 58.25%<br>
