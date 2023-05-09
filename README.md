@@ -1,4 +1,16 @@
 # DLFinalProject
+The goal is to finetune the mdoel xxx for sentiment classification tasks
+
+## Prerequisites:
+```
+pip install transformers
+pip install datasets
+```
+
+## Pretrained model and dataset used:
+* RoBERTa-base, xxx, xxx
+* xxx dataset
+
 
 ## Dataset: yelp_review_full
 Epoch:  1<br>
@@ -21,3 +33,4 @@ Epoch:  5<br>
         Train Loss: 0.01243 | Train Acc: 96.97%<br>
         Test. Loss: 0.20827 |  Test Acc: 60.15%<br>
         Time: 263.61 seconds<br>
+
