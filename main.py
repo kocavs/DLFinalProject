@@ -15,8 +15,10 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def calcuate_accuracy(preds, labels):
+    # Calculate the correct numbers
     idx_max = torch.argmax(preds, dim=-1)
-    n_correct = (idx_max==labels).sum().item()
+    n_correct = (idx_max == labels).sum().item()
+
     return n_correct
 
 
@@ -25,9 +27,9 @@ def train(model, train_loader, optimizer, scheduler, rank=None, mixed=False):
     total_loss = 0
     num_correct = 0
     num_total = 0
-
+    # Enable mixed single precision or not
     scaler = amp.GradScaler() if mixed else None
-
+    # Start Training by batch size
     for batch in train_loader:
         if rank:
             labels = batch['labels'].cuda(rank)
@@ -37,12 +39,11 @@ def train(model, train_loader, optimizer, scheduler, rank=None, mixed=False):
             labels = batch['labels'].to(device)
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
-
+        # Save training time with mixed method
         if mixed:
             with amp.autocast():
                 outputs = model(input_ids, attention_mask).logits
                 loss = torch.nn.CrossEntropyLoss()(outputs, labels)
-
             if scaler:
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
@@ -50,21 +51,24 @@ def train(model, train_loader, optimizer, scheduler, rank=None, mixed=False):
             else:
                 loss.backward()
                 optimizer.step()
-
+            # Update parameters
             scheduler.step()  
             optimizer.zero_grad()
         else:
+            # Get predict result
             outputs = model(input_ids, attention_mask).logits
+            # Calculate loss
             loss = torch.nn.CrossEntropyLoss()(outputs, labels)
             loss.backward()
+            # Update parameters
             optimizer.step()
             scheduler.step() 
             optimizer.zero_grad()
-
+        # Calculate correct labels
         num_correct += calcuate_accuracy(outputs, labels)
         total_loss += loss.item()
         num_total += labels.size(0)
-
+    # Calculate loss and accuracy
     avg_train_loss = total_loss / num_total
     avg_train_acc = num_correct / num_total * 100.0
 
@@ -87,15 +91,15 @@ def evaluate(model, test_loader, rank=None):
                 labels = batch['labels'].to(device)
                 input_ids = batch['input_ids'].to(device)
                 attention_mask = batch['attention_mask'].to(device)
-                
+            # Get predict result
             output = model(input_ids, attention_mask).logits
             loss = torch.nn.CrossEntropyLoss()(output, labels)
-
+            # Calculate correct labels
             total_loss += loss.item()
             total_correct += calcuate_accuracy(output, labels)
             total_samples += labels.size(0)
             num_total += labels.size(0)
-
+    # Calculate loss and accuracy
     average_loss = total_loss / num_total
     accuracy = (total_correct / num_total) * 100.0
 
@@ -165,22 +169,3 @@ if __name__ == "__main__":
         main(world_size=num_gpu, opts=opts)
     else:
         main(world_size=1, opts=opts)
-       
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
