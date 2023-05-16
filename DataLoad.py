@@ -9,7 +9,7 @@ def dataloader(name, token_name, train_length, batch_size):
         tokenizer = AutoTokenizer.from_pretrained(token_name)
         return tokenizer(examples["text"], padding="max_length", truncation=True)
     # Download dataset
-    datasets = load_dataset(name, cache_dir="./dataset")
+    datasets = load_dataset('tweet_eval', name, cache_dir="./dataset")
     # Tokenizing dataset
     tokenized_datasets = datasets.map(tokenize_function, batched=True)
     tokenized_datasets = tokenized_datasets.rename_column("label", "labels")

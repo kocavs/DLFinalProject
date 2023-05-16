@@ -107,11 +107,18 @@ def evaluate(model, test_loader, rank=None):
 
 
 def main(rank=None, world_size=None, opts=None):
+    best_acc = 0
     # Get dataset and model
-    train_loader, test_loader, train_datasets, test_datasets = dataloader(name="yelp_review_full",
-                                                                          token_name=opts.pretrained_model_name,
-                                                                          train_length=20000,
-                                                                          batch_size=opts.batch_size)
+    if opts.dataset == 'emotion':
+        train_loader, test_loader, train_datasets, test_datasets = dataloader(name=opts.dataset,
+                                                                              token_name=opts.pretrained_model_name,
+                                                                              train_length=3200,
+                                                                              batch_size=opts.batch_size)
+    else:
+        train_loader, test_loader, train_datasets, test_datasets = dataloader(name=opts.dataset,
+                                                                              token_name=opts.pretrained_model_name,
+                                                                              train_length=20000,
+                                                                              batch_size=opts.batch_size)
     model = AutoModelForSequenceClassification.from_pretrained(opts.pretrained_model_name, num_labels=opts.num_classes)
     # if using data parallel
     if opts.DP:
@@ -147,6 +154,10 @@ def main(rank=None, world_size=None, opts=None):
         print(f'\tTrain Loss: {avg_train_loss:.5f} | Train Acc: {avg_train_acc:.2f}%')
         print(f'\tTest. Loss: {avg_test_loss:.5f} |  Test Acc: {avg_test_acc:.2f}%')
         print(f"\tTime: {epoch_time:.2f} seconds")
+        # Save the best model
+        if avg_test_acc > best_acc:
+            best_acc = avg_test_acc
+            torch.save(model, "./" + opts.dataset + ".pt")
     
 
 if __name__ == "__main__":
@@ -156,6 +167,7 @@ if __name__ == "__main__":
     # Get the args
     parser = argparse.ArgumentParser()
     parser.add_argument('--pretrained_model_name', type=str, default='bert-base-uncased', help='Name of the pre-trained BERT model')
+    parser.add_argument('--dataset', type=str, default='emotion', help='Name of dataset')
     parser.add_argument('--epoch', type=int, default=5, help='Number of training epoches')
     parser.add_argument('--num_classes', type=int, default=5, help='Number of classes')
     parser.add_argument('--lr', type=int, default=2e-5, help='Learning Rate')
