@@ -17,7 +17,10 @@ For improved training,
 ```
 python main.py --batch_size 128 --DP --mixed
 ```
-
+For sample testing,
+```
+python result_testing.py
+```
 
 ## Pretrained model and dataset used:
 * BERT, RoBERTa-base, DistilBERT
