@@ -6,7 +6,7 @@ The goal is to finetune the models RoBerta, Bert and DistilBert for sentiment cl
 pip install transformers
 pip install datasets
 ```
-The suggested version of PyTorch is torch 1.13.1+cu116
+The suggested version of PyTorch is torch 1.13.1+cu116 on 2 RTX8000 (48GB)
 
 # Executing the project:
 For base base training
