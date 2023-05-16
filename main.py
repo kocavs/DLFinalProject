@@ -117,7 +117,7 @@ def main(rank=None, world_size=None, opts=None):
     else:
         train_loader, test_loader, train_datasets, test_datasets = dataloader(name=opts.dataset,
                                                                               token_name=opts.pretrained_model_name,
-                                                                              train_length=20000,
+                                                                              train_length=10000,
                                                                               batch_size=opts.batch_size)
     model = AutoModelForSequenceClassification.from_pretrained(opts.pretrained_model_name, num_labels=opts.num_classes)
     # if using data parallel
